@@ -12,6 +12,9 @@ defined('MOODLE_INTERNAL') || die;
 require_once($CFG->dirroot . '/report/teachersactivity/classes/report_teachersactivity_list_course_activity.php');
 require_once($CFG->dirroot . '/report/teachersactivity/classes/report_teachersactivity_list_learners_activity.php');
 require_once($CFG->dirroot . '/report/teachersactivity/classes/report_teachersactivity_list_performers_by_classrooms.php');
+require_once($CFG->dirroot . '/report/teachersactivity/classes/report_teachersactivity_list_performers_activity.php');
+require_once($CFG->dirroot . '/report/teachersactivity/classes/report_teachersactivity_list_activity_by_category.php');
+require_once($CFG->dirroot . '/report/teachersactivity/classes/report_teachersactivity_list_activities_of_participants.php');
 
 class report_teachersactivity implements renderable {
 
@@ -20,6 +23,7 @@ class report_teachersactivity implements renderable {
 
     /** @var string selected report list to display */
     public $reporttype = null;
+    public $teacherid = NULL;
     public $courseid;
     public $table;
     private $whereOptions = array();
@@ -31,11 +35,12 @@ class report_teachersactivity implements renderable {
      * @param moodle_url|string $url (optional) page url.
      * @param string $reporttype (optional) which report list to display.
      */
-    public function __construct($courseid = NULL, $url = "", $reporttype = "") {
+    public function __construct($courseid = NULL, $url = "", $reporttype = "", $teacherid = "") {
 
         global $PAGE;
 
         $this->courseid = $courseid;
+        $this->teacherid = $teacherid;
 
         $this->whereOptions[] = 'c.id = :courseid';
         $this->whereParameters['courseid'] = $courseid;
@@ -64,8 +69,246 @@ class report_teachersactivity implements renderable {
         return array(
             1 => get_string('listcourseactivity', 'report_teachersactivity'),   
             2 => get_string('listlearnersactivity', 'report_teachersactivity'),
-            3 => get_string('listperformersbyclassrooms', 'report_teachersactivity')
+            3 => get_string('listperformersbyclassrooms', 'report_teachersactivity'),
+            4 => get_string('listperformersactivity', 'report_teachersactivity'),
+            5 => get_string('listactivitybycategory', 'report_teachersactivity'),
+            6 => get_string('listactivitiesofparticipants', 'report_teachersactivity')
         );
+    }
+    
+    public function show_table_list_activity_by_category() {
+        
+    }
+    
+    public function show_table_list_activities_of_participants() {
+        global $DB;
+        
+        $ccid = $DB->get_field('course', 'category', array('id' => $this->courseid));
+        
+        $fields = "c.id AS id_ucilnice,
+                    c.shortname,
+                    IF(forumi.stevilo_forumov IS NULL,
+                        0,
+                        forumi.stevilo_forumov) AS st_forumov,
+                    IF(diskusije.stevilo_diskusij IS NULL,
+                        0,
+                        diskusije.stevilo_diskusij) AS st_diskusij,
+                    IF(komentarji.stevilo_komentarjev IS NULL,
+                        0,
+                        komentarji.stevilo_komentarjev) AS st_komentarjev,
+                    IF(naloge.stevilo_nalog IS NULL,
+                        0,
+                        naloge.stevilo_nalog) AS st_nalog,
+                    IF(naloge_odd.stevilo IS NULL,
+                        0,
+                        naloge_odd.stevilo) AS st_oddanih_nal,
+                    IF(ogledi.stevilo IS NULL,
+                        0,
+                        ogledi.stevilo) AS st_ogledov";
+        
+        $this->table = new list_activities_of_participants('report_log');
+        $this->table->set_sql($fields,
+                "{user} u
+                    INNER JOIN
+                {role_assignments} ra ON ra.userid = u.id
+                    INNER JOIN
+                {role} r ON ra.roleid = r.id
+                    INNER JOIN
+                {context} con ON ra.contextid = con.id
+                    INNER JOIN
+                {course} c ON c.id = con.instanceid
+                    AND con.contextlevel = 50
+                    LEFT OUTER JOIN
+                (SELECT 
+                    c.id AS id_ucilnice, COUNT(*) AS stevilo_forumov
+                FROM
+                    {course} c
+                INNER JOIN {forum} f ON f.course = c.id
+                WHERE
+                    c.id IN (SELECT 
+                            c.id AS id_ucilnice
+                        FROM
+                            {user} u
+                        INNER JOIN {role_assignments} ra ON ra.userid = u.id
+                        INNER JOIN {role} r ON ra.roleid = r.id
+                        INNER JOIN {context} con ON ra.contextid = con.id
+                        INNER JOIN {course} c ON c.id = con.instanceid
+                            AND con.contextlevel = 50
+                        WHERE
+                            r.id = 3 AND u.id = :uid1)
+                GROUP BY c.id) AS forumi ON forumi.id_ucilnice = c.id
+                    LEFT OUTER JOIN
+                (SELECT 
+                    c.id AS id_ucilnice, COUNT(fd.id) AS stevilo_diskusij
+                FROM
+                    {course} c
+                INNER JOIN {forum} f ON c.id = f.course
+                INNER JOIN {forum_discussions} fd ON fd.forum = f.id
+                WHERE
+                    c.id IN (SELECT 
+                            c.id AS id_ucilnice
+                        FROM
+                            {user} u
+                        INNER JOIN {role_assignments} ra ON ra.userid = u.id
+                        INNER JOIN {role} r ON ra.roleid = r.id
+                        INNER JOIN {context} con ON ra.contextid = con.id
+                        INNER JOIN {course} c ON c.id = con.instanceid
+                            AND con.contextlevel = 50
+                        WHERE
+                            r.id = 3 AND u.id = :uid2)
+                GROUP BY c.id) AS diskusije ON diskusije.id_ucilnice = c.id
+                    LEFT OUTER JOIN
+                (SELECT 
+                    c.id AS id_ucilnice, COUNT(*) AS stevilo_komentarjev
+                FROM
+                    {course} c
+                INNER JOIN {forum} f ON f.course = c.id
+                INNER JOIN {forum_discussions} fd ON fd.forum = f.id
+                INNER JOIN {forum_posts} fp ON fp.discussion = fd.id
+                WHERE
+                    c.id IN (SELECT 
+                            c.id AS id_ucilnice
+                        FROM
+                            {user} u
+                        INNER JOIN {role_assignments} ra ON ra.userid = u.id
+                        INNER JOIN {role} r ON ra.roleid = r.id
+                        INNER JOIN {context} con ON ra.contextid = con.id
+                        INNER JOIN {course} c ON c.id = con.instanceid
+                            AND con.contextlevel = 50
+                        WHERE
+                            r.id = 3 AND u.id = :uid3)
+                GROUP BY c.id) AS komentarji ON komentarji.id_ucilnice = c.id
+                    LEFT OUTER JOIN
+                (SELECT 
+                    c.id AS id_ucilnice,
+                        IF(a.id IS NULL, 0, COUNT(*)) AS stevilo_nalog
+                FROM
+                    {course} c
+                LEFT OUTER JOIN {assign} a ON c.id = a.course
+                WHERE
+                    c.id IN (SELECT 
+                            c.id AS id_ucilnice
+                        FROM
+                            {user} u
+                        INNER JOIN {role_assignments} ra ON ra.userid = u.id
+                        INNER JOIN {role} r ON ra.roleid = r.id
+                        INNER JOIN {context} con ON ra.contextid = con.id
+                        INNER JOIN {course} c ON c.id = con.instanceid
+                            AND con.contextlevel = 50
+                        WHERE
+                            r.id = 3 AND u.id = :uid4)
+                GROUP BY c.id) AS naloge ON naloge.id_ucilnice = c.id
+                    LEFT OUTER JOIN
+                (SELECT 
+                    c.id AS id_ucilnice,
+                        IF(ass.id IS NULL, 0, COUNT(*)) AS stevilo
+                FROM
+                    {assign} a
+                INNER JOIN {course} c ON c.id = a.course
+                INNER JOIN {assign_submission} ass ON ass.assignment = a.id
+                WHERE
+                    c.id IN (SELECT 
+                            c.id AS id_ucilnice
+                        FROM
+                            {user} u
+                        INNER JOIN {role_assignments} ra ON ra.userid = u.id
+                        INNER JOIN {role} r ON ra.roleid = r.id
+                        INNER JOIN {context} con ON ra.contextid = con.id
+                        INNER JOIN {course} c ON c.id = con.instanceid
+                            AND con.contextlevel = 50
+                        WHERE
+                            r.id = 3 AND u.id = :uid5)
+                        AND ass.status = 'submitted'
+                GROUP BY c.id) AS naloge_odd ON naloge_odd.id_ucilnice = c.id
+                    LEFT OUTER JOIN
+                (SELECT 
+                    log.courseid AS id_ucilnice, COUNT(*) AS stevilo
+                FROM
+                    {logstore_standard_log} log
+                WHERE
+                    log.courseid IN (SELECT 
+                            c.id AS id_ucilnice
+                        FROM
+                            {user} u
+                        INNER JOIN {role_assignments} ra ON ra.userid = u.id
+                        INNER JOIN {role} r ON ra.roleid = r.id
+                        INNER JOIN {context} con ON ra.contextid = con.id
+                        INNER JOIN {course} c ON c.id = con.instanceid
+                            AND con.contextlevel = 50
+                        WHERE
+                            r.id = 3 AND u.id = :uid6)
+                        AND action = 'viewed'
+                GROUP BY log.courseid) AS ogledi ON ogledi.id_ucilnice = c.id", 
+                "r.id = 3 AND u.id = :uid7 ORDER BY c.id",
+                array('uid1' => $this->teacherid, 'uid2' => $this->teacherid, 'uid3' => $this->teacherid, 'uid4' => $this->teacherid, 'uid5' => $this->teacherid, 'uid6' => $this->teacherid, 'uid7' => $this->teacherid));
+        
+        $this->table->define_baseurl($this->url);
+        $this->table->is_downloadable(true);
+        $this->table->show_download_buttons_at(array(TABLE_P_BOTTOM));
+        $this->table->out(25, true);
+    }
+    
+    public function show_table_list_performers_activity() {
+        global $DB;
+        
+        $ccid = $DB->get_field('course', 'category', array('id' => $this->courseid));
+        
+        $fields = "ime_ucilnice.ime,
+                    IF(urejanje.nazadnje_urejanje IS NULL,
+                        'nikoli ni urejal/a',
+                        urejanje.nazadnje_urejanje) AS zadnje_urejanje,
+                    IF(dostop.zadnji_dostop IS NULL,
+                        'nikoli ni dostopal/a',
+                        dostop.zadnji_dostop) AS zadnji_dostop";
+        
+        $this->table = new list_performers_activity('report_log');
+        $this->table->set_sql($fields,
+                "{course} c
+                    LEFT OUTER JOIN
+                (SELECT 
+                    c.shortname AS ime, c.id AS id_uc
+                FROM
+                    {course} c
+                INNER JOIN {course_categories} cc ON cc.id = c.category AND cc.id = :ccid1
+                GROUP BY c.id) AS ime_ucilnice ON c.id = ime_ucilnice.id_uc
+                    LEFT OUTER JOIN
+                (SELECT 
+                    c.id AS id_uc,
+                        FROM_UNIXTIME(MAX(la.timeaccess), ' %h:%i:%s %D %M %Y') AS zadnji_dostop
+                FROM
+                    {user_lastaccess} la
+                INNER JOIN {course} c ON c.id = la.courseid
+                INNER JOIN {course_categories} cc ON c.category = cc.id
+                INNER JOIN {context} cx ON c.id = cx.instanceid
+                INNER JOIN {role_assignments} ra ON cx.id = ra.contextid
+                WHERE
+                    ra.roleid IN (3)
+                        AND cx.contextlevel = 50
+                        AND cc.id = :ccid2
+                GROUP BY c.id) AS dostop ON dostop.id_uc = c.id
+                    LEFT OUTER JOIN
+                (SELECT 
+                    log.courseid,
+                        FROM_UNIXTIME(MAX(log.timecreated), ' %h:%i:%s %D %M %Y') AS nazadnje_urejanje
+                FROM
+                    {logstore_standard_log} log
+                INNER JOIN {course} c ON c.id = log.courseid
+                INNER JOIN {course_categories} cc ON c.category = cc.id
+                INNER JOIN {context} cx ON c.id = cx.instanceid
+                INNER JOIN {role_assignments} ra ON cx.id = ra.contextid
+                WHERE
+                    ra.roleid IN (3)
+                        AND cx.contextlevel = 50
+                        AND cc.id = :ccid3
+                        AND action IN ('updated' , 'created', 'uploaded', 'deleted', 'added', 'moved', 'removed', 'duplicated')
+                GROUP BY log.courseid) AS urejanje ON c.id = urejanje.courseid", 
+                "ime_ucilnice.ime IS NOT NULL",
+                array('ccid1' => $ccid, 'ccid2' => $ccid, 'ccid3' => $ccid));
+        
+        $this->table->define_baseurl($this->url);
+        $this->table->is_downloadable(true);
+        $this->table->show_download_buttons_at(array(TABLE_P_BOTTOM));
+        $this->table->out(25, true);
     }
     
     public function show_table_list_performers_by_classrooms() {

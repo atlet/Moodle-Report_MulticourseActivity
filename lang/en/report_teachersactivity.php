@@ -10,6 +10,9 @@ $string['showreport'] = 'Show report';
 $string['listcourseactivity'] = 'Course activity';
 $string['listlearnersactivity'] = 'Learners activity';
 $string['listperformersbyclassrooms'] = 'Performers by classrooms';
+$string['listperformersactivity'] = 'Performers activity';
+$string['listactivitybycategory'] = 'Activity by category';
+$string['listactivitiesofparticipants'] = 'Activities of participants';
 
 // report_teachersactivity_list_course_activity.php
 $string['shortname'] = 'Short name';
@@ -29,3 +32,20 @@ $string['diskusije_in_komentarji'] = 'Discussions and comments';
 // report_teachersactivity_list_performers_by_classrooms.php
 $string['firstname'] = 'First name';
 $string['lastname'] = 'Last name';
+
+// report_teachersactivity_list_performers_activity.php
+$string['ime'] = 'Name';
+$string['zadnje_urejanje'] = 'Last edit';
+$string['zadnji_dostop'] = 'Last view';
+
+// report_teachersactivity_list_activity_by_category.php
+$string['stevilo_priponk'] = 'N. of attachments';
+$string['stevilo_www_strani'] = 'N. of webpages';
+
+// report_teachersactivity_list_activities_of_participants.php
+$string['st_forumov'] = 'N. of forums';
+$string['st_diskusij'] = 'N. of discusions';
+$string['st_komentarjev'] = 'N. of comments';
+$string['st_nalog'] = 'N. of tasks';
+$string['st_oddanih_nal'] = 'N. of reported tasks';
+$string['st_ogledov'] = 'N. of views';

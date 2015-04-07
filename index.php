@@ -12,6 +12,7 @@ require('../../config.php');
 require_once($CFG->dirroot.'/report/teachersactivity/lib.php');
 require_once($CFG->dirroot.'/report/teachersactivity/renderable.php');
 $reporttype = optional_param('reporttype', '', PARAM_INT); // Which report list to display.
+$teacherid = optional_param('teacherid', '', PARAM_INT); // Which report list to display.
 
 $id = optional_param('id', 0, PARAM_INT);// Course ID.
 $params = array();
@@ -21,6 +22,10 @@ if ($id !== 0) {
 
 if ($reporttype !== 0) {
     $params['reporttype'] = $reporttype;
+}
+
+if ($teacherid !== 0) {
+    $params['teacherid'] = $teacherid;
 }
 
 $url = new moodle_url("/report/teachersactivity/index.php", $params);
@@ -42,7 +47,7 @@ if ($id) {
 require_capability('report/teachersactivity:view', $context);
 
 $output = $PAGE->get_renderer('report_teachersactivity');
-$submissionwidget = new report_teachersactivity($id, $url, $reporttype);
+$submissionwidget = new report_teachersactivity($id, $url, $reporttype, $teacherid);
 
 echo $output->header();
 echo $output->render($submissionwidget);
@@ -58,6 +63,18 @@ switch ($reporttype) {
     case 3:
         $submissionwidget->show_table_list_performers_by_classrooms();
         break;
+    
+    case 4:
+        $submissionwidget->show_table_list_performers_activity();
+        break;
+    
+    case 5:
+        $submissionwidget->show_table_list_activity_by_category();
+        break;
+    
+    case 6:
+        $submissionwidget->show_table_list_activities_of_participants();
+            break;
     
     default:
         break;
