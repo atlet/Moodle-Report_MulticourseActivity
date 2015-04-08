@@ -13,6 +13,7 @@ $string['listperformersbyclassrooms'] = 'Performers by classrooms';
 $string['listperformersactivity'] = 'Performers activity';
 $string['listactivitybycategory'] = 'Activity by category';
 $string['listactivitiesofparticipants'] = 'Activities of participants';
+$string['listteachersactivity'] = 'Teachers activity';
 
 // report_teachersactivity_list_course_activity.php
 $string['shortname'] = 'Short name';
@@ -49,3 +50,8 @@ $string['st_komentarjev'] = 'N. of comments';
 $string['st_nalog'] = 'N. of tasks';
 $string['st_oddanih_nal'] = 'N. of reported tasks';
 $string['st_ogledov'] = 'N. of views';
+
+// report_teachersactivity_list_teachers_activity.php
+$string['ime'] = 'First name';
+$string['priimek'] = 'Last name';
+$string['nazadnje_urejanje'] = 'Last edit';

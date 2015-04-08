@@ -75,6 +75,10 @@ switch ($reporttype) {
     case 6:
         $submissionwidget->show_table_list_activities_of_participants();
             break;
+        
+    case 7:
+        $submissionwidget->show_table_list_teachers_activity();
+        break;
     
     default:
         break;

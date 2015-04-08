@@ -18,7 +18,8 @@ class list_learners_activity extends table_sql {
 
         $this->set_attribute('class', 'reportlog generaltable generalbox');
 
-        $this->define_columns(array('ime_ucilnice', 'stevilo_udel', 'stevilo_nalog', 'stevilo_oddanih_nalog', 'stevilo_kvizov', 'stevilo_resevanj_kvizov', 'diskusije_in_komentarji'));
+        $this->define_columns(array('ime_ucilnice', 'stevilo_udel', 'stevilo_nalog', 'stevilo_oddanih_nalog', 'stevilo_kvizov',
+            'stevilo_resevanj_kvizov', 'diskusije_in_komentarji', 'id_ucilnice'));
         $this->define_headers(array(
             get_string('ime_ucilnice', 'report_teachersactivity'),
             get_string('stevilo_udel', 'report_teachersactivity'),
@@ -27,7 +28,7 @@ class list_learners_activity extends table_sql {
             get_string('stevilo_kvizov', 'report_teachersactivity'),
             get_string('stevilo_resevanj_kvizov', 'report_teachersactivity'),
             get_string('diskusije_in_komentarji', 'report_teachersactivity'),
-            get_string('diskusije_in_komentarji', 'report_teachersactivity')
+            'a'
                 )
         );
         $this->collapsible(false);
@@ -36,7 +37,16 @@ class list_learners_activity extends table_sql {
     }
 
     function other_cols($colname, $value) {
-        
+        if ($colname == 'id_ucilnice') {            
+            $caurl = new moodle_url('/report/teachersactivity/index.php', array('id' => $value->id_ucilnice, 'reporttype' => 1));
+            $pbcurl = new moodle_url('/report/teachersactivity/index.php', array('id' => $value->id_ucilnice, 'reporttype' => 3));
+
+            $ret = '<a href="' . $caurl . '">' . get_string('listcourseactivity', 'report_teachersactivity') . '</a>';
+            $ret .= ' | ';
+            $ret .= '<a href="' . $pbcurl . '">' . get_string('listperformersbyclassrooms', 'report_teachersactivity') . '</a>';
+
+            return $ret;
+        }
     }
 
     function query_db($pagesize, $useinitialsbar = true) {

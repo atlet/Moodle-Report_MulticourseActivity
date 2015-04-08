@@ -15,6 +15,7 @@ require_once($CFG->dirroot . '/report/teachersactivity/classes/report_teachersac
 require_once($CFG->dirroot . '/report/teachersactivity/classes/report_teachersactivity_list_performers_activity.php');
 require_once($CFG->dirroot . '/report/teachersactivity/classes/report_teachersactivity_list_activity_by_category.php');
 require_once($CFG->dirroot . '/report/teachersactivity/classes/report_teachersactivity_list_activities_of_participants.php');
+require_once($CFG->dirroot . '/report/teachersactivity/classes/report_teachersactivity_list_teachers_activity.php');
 
 class report_teachersactivity implements renderable {
 
@@ -72,18 +73,161 @@ class report_teachersactivity implements renderable {
             3 => get_string('listperformersbyclassrooms', 'report_teachersactivity'),
             4 => get_string('listperformersactivity', 'report_teachersactivity'),
             5 => get_string('listactivitybycategory', 'report_teachersactivity'),
-            6 => get_string('listactivitiesofparticipants', 'report_teachersactivity')
+            6 => get_string('listactivitiesofparticipants', 'report_teachersactivity'),
+            7 => get_string('listteachersactivity', 'report_teachersactivity')
         );
     }
     
-    public function show_table_list_activity_by_category() {
+    // Aktivnosti učitelja
+    public function show_table_list_teachers_activity() {
+        $fields = "c.id, 
+                    u.firstname AS ime,
+                    u.lastname AS priimek,
+                    c.shortname,
+                    IF(urejanje.nazadnje_urejanje IS NULL,
+                        'nikoli ni urejal/a',
+                        urejanje.nazadnje_urejanje) AS nazadnje_urejanje,
+                    (SELECT 
+                            IF(FROM_UNIXTIME(MAX(la.timeaccess), ' %h:%i:%s %D %M %Y') IS NULL,
+                                    'nikoli ni dostopil/a',
+                                    FROM_UNIXTIME(MAX(la.timeaccess), ' %h:%i:%s %D %M %Y'))
+                        FROM
+                            {user_lastaccess} la
+                        WHERE
+                            c.id = la.courseid AND la.userid = u.id) AS zadnji_dostop";
         
+        $this->table = new list_teachers_activity('report_log');
+        $this->table->set_sql($fields,
+                "{course} c
+                    INNER JOIN
+                {context} cx ON c.id = cx.instanceid
+                    INNER JOIN
+                {role_assignments} ra ON cx.id = ra.contextid
+                    INNER JOIN
+                {user} u ON ra.userid = u.id
+                    LEFT OUTER JOIN
+                (SELECT 
+                    log.courseid,
+                        FROM_UNIXTIME(MAX(timecreated), ' %h:%i:%s %D %M %Y') AS nazadnje_urejanje
+                FROM
+                    {logstore_standard_log} log
+                WHERE
+                    userid = 4325
+                        AND action IN ('updated' , 'created', 'uploaded', 'deleted', 'added', 'moved', 'removed', 'duplicated')
+                GROUP BY courseid) AS urejanje ON c.id = urejanje.courseid",
+                "ra.roleid IN (3)
+                        AND cx.contextlevel = 50
+                        AND u.id = :uid
+                ORDER BY (SELECT 
+                        MAX(la.timeaccess)
+                    FROM
+                        {user_lastaccess} la
+                    WHERE
+                        c.id = la.courseid AND la.userid = u.id) DESC",
+                array('uid' => $this->teacherid));
+        
+        $this->table->define_baseurl($this->url);
+        $this->table->is_downloadable(true);
+        $this->table->show_download_buttons_at(array(TABLE_P_BOTTOM));
+        $this->table->out(25, true);
     }
     
-    public function show_table_list_activities_of_participants() {
+    // Aktivnosti po kategoriji
+    public function show_table_list_activity_by_category() {
         global $DB;
         
         $ccid = $DB->get_field('course', 'category', array('id' => $this->courseid));
+        
+        $fields = "stevilo_nalog.id_nal,
+                    stevilo_nalog.ime AS ime_ucilnice,
+                    IF(stevilo_nalog.stevilo IS NULL,
+                        0,
+                        stevilo_nalog.stevilo) AS stevilo_nalog,
+                    IF(stevilo_kvizov.stevilo IS NULL,
+                        0,
+                        stevilo_kvizov.stevilo) AS stevilo_kvizov,
+                    IF(stevilo_priponk.stevilo IS NULL,
+                        0,
+                        stevilo_priponk.stevilo) AS stevilo_priponk,
+                    IF(stevilo_www.stevilo IS NULL,
+                        0,
+                        stevilo_www.stevilo) AS stevilo_www_strani,
+                    IF(stevilo_udel.stevilo IS NULL,
+                        0,
+                        stevilo_udel.stevilo) AS stevilo_udel";
+        
+        $this->table = new list_activity_by_category('report_log');
+        $this->table->set_sql($fields,
+                "{course} c
+                    LEFT OUTER JOIN
+                (SELECT 
+                    cou.shortname AS ime,
+                        cou.id AS id_nal,
+                        IF(a.id IS NULL, 0, COUNT(*)) AS stevilo
+                FROM
+                    {course} cou
+                LEFT OUTER JOIN {assign} a ON cou.id = a.course
+                INNER JOIN {course_categories} cc ON cc.id = cou.category
+                WHERE
+                    cc.id = :ccid1 AND a.id IS NOT NULL
+                GROUP BY cou.id) AS stevilo_nalog ON stevilo_nalog.id_nal = c.id
+                    LEFT OUTER JOIN
+                (SELECT 
+                    c.id AS id_kviz, IF(q.id IS NULL, 0, COUNT(*)) AS stevilo
+                FROM
+                    {course} c
+                LEFT OUTER JOIN {quiz} q ON c.id = q.course
+                INNER JOIN {course_categories} cc ON cc.id = c.category
+                WHERE
+                    cc.id = :ccid2
+                GROUP BY c.id) AS stevilo_kvizov ON stevilo_kvizov.id_kviz = c.id
+                    LEFT OUTER JOIN
+                (SELECT 
+                    cou.id AS id_prip,
+                        IF(cou.id IS NULL, 0, COUNT(*)) AS stevilo
+                FROM
+                    {course} cou
+                LEFT OUTER JOIN {context} con ON cou.id = con.instanceid
+                INNER JOIN {files} f ON f.contextid = con.id
+                INNER JOIN {course_categories} cc ON cc.id = cou.category
+                WHERE
+                    cc.id = :ccid3
+                GROUP BY cou.id) AS stevilo_priponk ON stevilo_priponk.id_prip = c.id
+                    LEFT OUTER JOIN
+                (SELECT 
+                    c.id AS id_www, IF(p.id IS NULL, 0, COUNT(*)) AS stevilo
+                FROM
+                    {course} c
+                LEFT OUTER JOIN {page} p ON c.id = p.course
+                INNER JOIN {course_categories} cc ON cc.id = c.category
+                WHERE
+                    cc.id = :ccid4
+                GROUP BY c.id) AS stevilo_www ON stevilo_www.id_www = c.id
+                    LEFT OUTER JOIN
+                (SELECT 
+                    c.id AS id_udel, COUNT(*) AS stevilo
+                FROM
+                    {user} u
+                INNER JOIN {role_assignments} ra ON ra.userid = u.id
+                INNER JOIN {role} r ON ra.roleid = r.id
+                INNER JOIN {context} con ON ra.contextid = con.id
+                INNER JOIN {course} c ON c.id = con.instanceid
+                    AND con.contextlevel = 50
+                INNER JOIN {course_categories} cc ON cc.id = c.category
+                WHERE
+                    r.shortname = 'student' AND cc.id = :ccid5
+                GROUP BY cc.parent , c.shortname) AS stevilo_udel ON stevilo_udel.id_udel = c.id", 
+                "stevilo_nalog.ime IS NOT NULL",
+                array('ccid1' => $ccid, 'ccid2' => $ccid, 'ccid3' => $ccid, 'ccid4' => $ccid, 'ccid5' => $ccid));
+        
+        $this->table->define_baseurl($this->url);
+        $this->table->is_downloadable(true);
+        $this->table->show_download_buttons_at(array(TABLE_P_BOTTOM));
+        $this->table->out(25, true);
+    }
+    
+    // Aktivnosti udeležencev
+    public function show_table_list_activities_of_participants() {        
         
         $fields = "c.id AS id_ucilnice,
                     c.shortname,
@@ -248,6 +392,7 @@ class report_teachersactivity implements renderable {
         $this->table->out(25, true);
     }
     
+    // Aktivnosti izvajalcev
     public function show_table_list_performers_activity() {
         global $DB;
         
@@ -311,8 +456,9 @@ class report_teachersactivity implements renderable {
         $this->table->out(25, true);
     }
     
+    // Izvajalci po učilnicah
     public function show_table_list_performers_by_classrooms() {
-        $fields = "u.id, c.shortname, u.firstname, u.lastname";
+        $fields = "u.id, c.id AS cid, c.shortname, u.firstname, u.lastname";
         
         $this->whereOptions[] = 'r.id = 3';
         
@@ -337,6 +483,7 @@ class report_teachersactivity implements renderable {
         $this->table->out(25, true);
     }
     
+    // Aktivnosti učečih
     public function show_table_list_learners_activity () {
         global $CFG, $DB;
         
@@ -457,6 +604,7 @@ class report_teachersactivity implements renderable {
         
     }
     
+    // Aktivnosti v učilnici
     public function show_table_list_course_activity () {
         global $CFG;
         

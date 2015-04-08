@@ -1,7 +1,7 @@
 <?php
 
 /**
- * TeachersActivity table for displaying list of performery by classrooms.
+ * TeachersActivity table for displaying list of teachers activity.
  *
  * @package    report_teachersactivity
  * @copyright  2015 Andraž Prinčič <atletek@gmail.com>
@@ -11,19 +11,20 @@ defined('MOODLE_INTERNAL') || die;
 
 require_once("$CFG->libdir/tablelib.php");
 
-class list_performers_by_classrooms extends table_sql {
+class list_teachers_activity extends table_sql {
 
     public function __construct($uniqueid) {
         parent::__construct($uniqueid);
 
         $this->set_attribute('class', 'reportlog generaltable generalbox');
 
-        $this->define_columns(array('shortname', 'firstname', 'lastname', 'id'));
+        $this->define_columns(array('ime', 'priimek', 'shortname', 'nazadnje_urejanje', 'zadnji_dostop'));
         $this->define_headers(array(
+            get_string('ime', 'report_teachersactivity'),
+            get_string('priimek', 'report_teachersactivity'),
             get_string('shortname', 'report_teachersactivity'),
-            get_string('firstname', 'report_teachersactivity'),
-            get_string('lastname', 'report_teachersactivity'),
-            ''
+            get_string('nazadnje_urejanje', 'report_teachersactivity'),
+            get_string('zadnji_dostop', 'report_teachersactivity')
                 )
         );
         $this->collapsible(false);
@@ -32,16 +33,7 @@ class list_performers_by_classrooms extends table_sql {
     }
 
     function other_cols($colname, $value) {
-        if ($colname == 'id') {
-            $aopurl = new moodle_url('/report/teachersactivity/index.php', array('id' => $value->cid, 'teacherid' => $value->id, 'reporttype' => 6));
-            $taurl = new moodle_url('/report/teachersactivity/index.php', array('id' => $value->cid, 'teacherid' => $value->id, 'reporttype' => 7));
-
-            $ret = '<a href="' . $aopurl . '">' . get_string('listactivitiesofparticipants', 'report_teachersactivity') . '</a>';
-            $ret .= ' | ';
-            $ret .= '<a href="' . $taurl . '">' . get_string('listteachersactivity', 'report_teachersactivity') . '</a>';
-
-            return $ret;
-        }
+        
     }
 
     function query_db($pagesize, $useinitialsbar = true) {
