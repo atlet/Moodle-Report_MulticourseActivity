@@ -14,7 +14,7 @@ require_once($CFG->dirroot.'/report/teachersactivity/renderable.php');
 $reporttype = optional_param('reporttype', '', PARAM_INT); // Which report list to display.
 $teacherid = optional_param('teacherid', '', PARAM_INT); // Which report list to display.
 
-$id = optional_param('id', 0, PARAM_INT);// Course ID.
+$id = required_param('id', PARAM_INT);// Course ID.
 $params = array();
 if ($id !== 0) {
     $params['id'] = $id;

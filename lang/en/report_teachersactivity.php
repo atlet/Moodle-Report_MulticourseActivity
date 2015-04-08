@@ -5,6 +5,8 @@ $string['pluginname'] = 'Teachers Activity';
 // renderer.php
 $string['selectreporttype'] = 'Report type';
 $string['showreport'] = 'Show report';
+$string['selectcourse'] = 'Select course';
+$string['selectuser'] = 'Selecr an user';
 
 // renderable.php
 $string['listcourseactivity'] = 'Course activity';
