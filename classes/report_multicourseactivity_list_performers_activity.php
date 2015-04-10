@@ -1,9 +1,9 @@
 <?php
 
 /**
- * TeachersActivity table for displaying list of course activity.
+ * TeachersActivity table for displaying list of performery activity.
  *
- * @package    report_teachersactivity
+ * @package    report_multicourseactivity
  * @copyright  2015 Andraž Prinčič <atletek@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -11,23 +11,18 @@ defined('MOODLE_INTERNAL') || die;
 
 require_once("$CFG->libdir/tablelib.php");
 
-class list_course_activity extends table_sql {
+class list_performers_activity extends table_sql {
 
     public function __construct($uniqueid) {
         parent::__construct($uniqueid);
 
         $this->set_attribute('class', 'reportlog generaltable generalbox');
 
-        $this->define_columns(array('shortname', 'stevilo_kvizov', 'stevilo_resevanj_kvizov', 'stevilo_nalog', 'stevilo_oddanih_nalog', 'stevilo_forumov', 'stevilo_diskusij', 'stevilo_komentarjev'));
+        $this->define_columns(array('ime', 'zadnje_urejanje', 'zadnji_dostop'));
         $this->define_headers(array(
-            get_string('shortname', 'report_teachersactivity'),
-            get_string('stevilo_kvizov', 'report_teachersactivity'),
-            get_string('stevilo_resevanj_kvizov', 'report_teachersactivity'),
-            get_string('stevilo_nalog', 'report_teachersactivity'),
-            get_string('stevilo_oddanih_nalog', 'report_teachersactivity'),
-            get_string('stevilo_forumov', 'report_teachersactivity'),
-            get_string('stevilo_diskusij', 'report_teachersactivity'),
-            get_string('stevilo_komentarjev', 'report_teachersactivity')
+            get_string('ime', 'report_multicourseactivity'),
+            get_string('zadnje_urejanje', 'report_multicourseactivity'),
+            get_string('zadnji_dostop', 'report_multicourseactivity')
                 )
         );
         $this->collapsible(false);

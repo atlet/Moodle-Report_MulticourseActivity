@@ -3,14 +3,14 @@
 /**
  * TeachersActivity index file.
  *
- * @package    report_teachersactivity
+ * @package    report_multicourseactivity
  * @copyright  2015 Andraž Prinčič <atletek@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require('../../config.php');
-require_once($CFG->dirroot.'/report/teachersactivity/lib.php');
-require_once($CFG->dirroot.'/report/teachersactivity/renderable.php');
+require_once($CFG->dirroot.'/report/multicourseactivity/lib.php');
+require_once($CFG->dirroot.'/report/multicourseactivity/renderable.php');
 $reporttype = optional_param('reporttype', '', PARAM_INT); // Which report list to display.
 $teacherid = optional_param('teacherid', '', PARAM_INT); // Which report list to display.
 
@@ -28,9 +28,9 @@ if ($teacherid !== 0) {
     $params['teacherid'] = $teacherid;
 }
 
-$url = new moodle_url("/report/teachersactivity/index.php", $params);
+$url = new moodle_url("/report/multicourseactivity/index.php", $params);
 
-$PAGE->set_url('/report/teachersactivity/index.php', $params);
+$PAGE->set_url('/report/multicourseactivity/index.php', $params);
 $PAGE->set_pagelayout('report');
 
 $course = null;
@@ -44,10 +44,10 @@ if ($id) {
     $PAGE->set_context($context);
 }
 
-require_capability('report/teachersactivity:view', $context);
+require_capability('report/multicourseactivity:view', $context);
 
-$output = $PAGE->get_renderer('report_teachersactivity');
-$submissionwidget = new report_teachersactivity($id, $url, $reporttype, $teacherid);
+$output = $PAGE->get_renderer('report_multicourseactivity');
+$submissionwidget = new report_multicourseactivity($id, $url, $reporttype, $teacherid);
 
 echo $output->header();
 echo $output->render($submissionwidget);

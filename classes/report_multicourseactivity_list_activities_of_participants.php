@@ -3,7 +3,7 @@
 /**
  * TeachersActivity table for displaying list of activities of participants.
  *
- * @package    report_teachersactivity
+ * @package    report_multicourseactivity
  * @copyright  2015 Andraž Prinčič <atletek@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -20,13 +20,13 @@ class list_activities_of_participants extends table_sql {
 
         $this->define_columns(array('shortname', 'st_forumov', 'st_diskusij', 'st_komentarjev', 'st_nalog', 'st_oddanih_nal', 'st_ogledov'));
         $this->define_headers(array(
-            get_string('shortname', 'report_teachersactivity'),
-            get_string('st_forumov', 'report_teachersactivity'),
-            get_string('st_diskusij', 'report_teachersactivity'),
-            get_string('st_komentarjev', 'report_teachersactivity'),
-            get_string('st_nalog', 'report_teachersactivity'),
-            get_string('st_oddanih_nal', 'report_teachersactivity'),
-            get_string('st_ogledov', 'report_teachersactivity')
+            get_string('shortname', 'report_multicourseactivity'),
+            get_string('st_forumov', 'report_multicourseactivity'),
+            get_string('st_diskusij', 'report_multicourseactivity'),
+            get_string('st_komentarjev', 'report_multicourseactivity'),
+            get_string('st_nalog', 'report_multicourseactivity'),
+            get_string('st_oddanih_nal', 'report_multicourseactivity'),
+            get_string('st_ogledov', 'report_multicourseactivity')
                 )
         );
         $this->collapsible(false);

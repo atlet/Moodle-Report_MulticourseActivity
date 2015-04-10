@@ -3,21 +3,21 @@
 /**
  * TeachersActivity report renderable.
  *
- * @package    report_teachersactivity
+ * @package    report_multicourseactivity
  * @copyright  2015 Andraž Prinčič <atletek@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die;
 
-require_once($CFG->dirroot . '/report/teachersactivity/classes/report_teachersactivity_list_course_activity.php');
-require_once($CFG->dirroot . '/report/teachersactivity/classes/report_teachersactivity_list_learners_activity.php');
-require_once($CFG->dirroot . '/report/teachersactivity/classes/report_teachersactivity_list_performers_by_classrooms.php');
-require_once($CFG->dirroot . '/report/teachersactivity/classes/report_teachersactivity_list_performers_activity.php');
-require_once($CFG->dirroot . '/report/teachersactivity/classes/report_teachersactivity_list_activity_by_category.php');
-require_once($CFG->dirroot . '/report/teachersactivity/classes/report_teachersactivity_list_activities_of_participants.php');
-require_once($CFG->dirroot . '/report/teachersactivity/classes/report_teachersactivity_list_teachers_activity.php');
+require_once($CFG->dirroot . '/report/multicourseactivity/classes/report_multicourseactivity_list_course_activity.php');
+require_once($CFG->dirroot . '/report/multicourseactivity/classes/report_multicourseactivity_list_learners_activity.php');
+require_once($CFG->dirroot . '/report/multicourseactivity/classes/report_multicourseactivity_list_performers_by_classrooms.php');
+require_once($CFG->dirroot . '/report/multicourseactivity/classes/report_multicourseactivity_list_performers_activity.php');
+require_once($CFG->dirroot . '/report/multicourseactivity/classes/report_multicourseactivity_list_activity_by_category.php');
+require_once($CFG->dirroot . '/report/multicourseactivity/classes/report_multicourseactivity_list_activities_of_participants.php');
+require_once($CFG->dirroot . '/report/multicourseactivity/classes/report_multicourseactivity_list_teachers_activity.php');
 
-class report_teachersactivity implements renderable {
+class report_multicourseactivity implements renderable {
 
     /** @var moodle_url url of report page */
     public $url;
@@ -68,13 +68,13 @@ class report_teachersactivity implements renderable {
 
     public function getAvailablereports() {
         return array(
-            1 => get_string('listcourseactivity', 'report_teachersactivity'),   
-            2 => get_string('listlearnersactivity', 'report_teachersactivity'),
-            3 => get_string('listperformersbyclassrooms', 'report_teachersactivity'),
-            4 => get_string('listperformersactivity', 'report_teachersactivity'),
-            5 => get_string('listactivitybycategory', 'report_teachersactivity'),
-            6 => get_string('listactivitiesofparticipants', 'report_teachersactivity'),
-            7 => get_string('listteachersactivity', 'report_teachersactivity')
+            1 => get_string('listcourseactivity', 'report_multicourseactivity'),   
+            2 => get_string('listlearnersactivity', 'report_multicourseactivity'),
+            3 => get_string('listperformersbyclassrooms', 'report_multicourseactivity'),
+            4 => get_string('listperformersactivity', 'report_multicourseactivity'),
+            5 => get_string('listactivitybycategory', 'report_multicourseactivity'),
+            6 => get_string('listactivitiesofparticipants', 'report_multicourseactivity'),
+            7 => get_string('listmulticourseactivity', 'report_multicourseactivity')
         );
     }
     

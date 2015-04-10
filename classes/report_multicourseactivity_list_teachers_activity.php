@@ -1,9 +1,9 @@
 <?php
 
 /**
- * TeachersActivity table for displaying list of learners activity.
+ * TeachersActivity table for displaying list of teachers activity.
  *
- * @package    report_teachersactivity
+ * @package    report_multicourseactivity
  * @copyright  2015 Andraž Prinčič <atletek@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -11,24 +11,20 @@ defined('MOODLE_INTERNAL') || die;
 
 require_once("$CFG->libdir/tablelib.php");
 
-class list_learners_activity extends table_sql {
+class list_teachers_activity extends table_sql {
 
     public function __construct($uniqueid) {
         parent::__construct($uniqueid);
 
         $this->set_attribute('class', 'reportlog generaltable generalbox');
 
-        $this->define_columns(array('ime_ucilnice', 'stevilo_udel', 'stevilo_nalog', 'stevilo_oddanih_nalog', 'stevilo_kvizov',
-            'stevilo_resevanj_kvizov', 'diskusije_in_komentarji', 'id_ucilnice'));
+        $this->define_columns(array('ime', 'priimek', 'shortname', 'nazadnje_urejanje', 'zadnji_dostop'));
         $this->define_headers(array(
-            get_string('ime_ucilnice', 'report_teachersactivity'),
-            get_string('stevilo_udel', 'report_teachersactivity'),
-            get_string('stevilo_nalog', 'report_teachersactivity'),
-            get_string('stevilo_oddanih_nalog', 'report_teachersactivity'),
-            get_string('stevilo_kvizov', 'report_teachersactivity'),
-            get_string('stevilo_resevanj_kvizov', 'report_teachersactivity'),
-            get_string('diskusije_in_komentarji', 'report_teachersactivity'),
-            'a'
+            get_string('ime', 'report_multicourseactivity'),
+            get_string('priimek', 'report_multicourseactivity'),
+            get_string('shortname', 'report_multicourseactivity'),
+            get_string('nazadnje_urejanje', 'report_multicourseactivity'),
+            get_string('zadnji_dostop', 'report_multicourseactivity')
                 )
         );
         $this->collapsible(false);
@@ -37,16 +33,7 @@ class list_learners_activity extends table_sql {
     }
 
     function other_cols($colname, $value) {
-        if ($colname == 'id_ucilnice') {            
-            $caurl = new moodle_url('/report/teachersactivity/index.php', array('id' => $value->id_ucilnice, 'reporttype' => 1));
-            $pbcurl = new moodle_url('/report/teachersactivity/index.php', array('id' => $value->id_ucilnice, 'reporttype' => 3));
-
-            $ret = '<a href="' . $caurl . '">' . get_string('listcourseactivity', 'report_teachersactivity') . '</a>';
-            $ret .= ' | ';
-            $ret .= '<a href="' . $pbcurl . '">' . get_string('listperformersbyclassrooms', 'report_teachersactivity') . '</a>';
-
-            return $ret;
-        }
+        
     }
 
     function query_db($pagesize, $useinitialsbar = true) {

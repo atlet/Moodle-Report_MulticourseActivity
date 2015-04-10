@@ -3,29 +3,29 @@
 /**
  * TeachersActivity report renderer.
  *
- * @package    report_teachersactivity
+ * @package    report_multicourseactivity
  * @copyright  2015 Andraž Prinčič <atletek@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die;
 
-class report_teachersactivity_renderer extends plugin_renderer_base {
+class report_multicourseactivity_renderer extends plugin_renderer_base {
 
-    protected function render_report_teachersactivity(report_teachersactivity $reportteachersactivity) {
+    protected function render_report_multicourseactivity(report_multicourseactivity $reportmulticourseactivity) {
 
-        switch ($reportteachersactivity->reporttype) {
+        switch ($reportmulticourseactivity->reporttype) {
             case 1:
             case 3:
-                $this->report_selector_form_course_selector($reportteachersactivity);
+                $this->report_selector_form_course_selector($reportmulticourseactivity);
                 break;
 
             case 6:
             case 7:
-                $this->report_selector_form_teacher_selector($reportteachersactivity);
+                $this->report_selector_form_teacher_selector($reportmulticourseactivity);
                 break;
             
             default:
-                $this->report_selector_form($reportteachersactivity);
+                $this->report_selector_form($reportmulticourseactivity);
                 break;
         }
     }
@@ -33,31 +33,31 @@ class report_teachersactivity_renderer extends plugin_renderer_base {
     /**
      * This function is used to generate and display selector form
      *
-     * @param report_teachersactivity $reportteachersactivity teachersactivity report.
+     * @param report_multicourseactivity $reportmulticourseactivity multicourseactivity report.
      */
-    public function report_selector_form(report_teachersactivity $reportteachersactivity) {
+    public function report_selector_form(report_multicourseactivity $reportmulticourseactivity) {
         echo html_writer::start_tag('form',
-                array('class' => 'reportbadgesselecform', 'action' => $reportteachersactivity->url, 'method' => 'get'));
+                array('class' => 'reportbadgesselecform', 'action' => $reportmulticourseactivity->url, 'method' => 'get'));
         echo html_writer::start_div();
 
         echo html_writer::empty_tag('input',
-                array('type' => 'hidden', 'name' => 'id', 'value' => $reportteachersactivity->courseid));
+                array('type' => 'hidden', 'name' => 'id', 'value' => $reportmulticourseactivity->courseid));
 
-        echo html_writer::label(get_string('selectreporttype', 'report_teachersactivity'), 'menureader', false);
-        echo html_writer::select($reportteachersactivity->getAvailablereports(), 'reporttype',
-                $reportteachersactivity->reporttype, false);
+        echo html_writer::label(get_string('selectreporttype', 'report_multicourseactivity'), 'menureader', false);
+        echo html_writer::select($reportmulticourseactivity->getAvailablereports(), 'reporttype',
+                $reportmulticourseactivity->reporttype, false);
 
         echo html_writer::empty_tag('input',
-                array('type' => 'submit', 'value' => get_string('showreport', 'report_teachersactivity')));
+                array('type' => 'submit', 'value' => get_string('showreport', 'report_multicourseactivity')));
 
         echo html_writer::end_div();
         echo html_writer::end_tag('form');
     }
 
-    public function report_selector_form_course_selector(report_teachersactivity $reportteachersactivity) {
+    public function report_selector_form_course_selector(report_multicourseactivity $reportmulticourseactivity) {
         global $DB;
         
-        $ccid = $DB->get_field('course', 'category', array('id' => $reportteachersactivity->courseid));
+        $ccid = $DB->get_field('course', 'category', array('id' => $reportmulticourseactivity->courseid));
         $courses = $DB->get_records('course', array('category' => $ccid));
         
         $coursesList[] = array();
@@ -67,27 +67,27 @@ class report_teachersactivity_renderer extends plugin_renderer_base {
         }
         
         echo html_writer::start_tag('form',
-                array('class' => 'reportbadgesselecform', 'action' => $reportteachersactivity->url, 'method' => 'get'));
+                array('class' => 'reportbadgesselecform', 'action' => $reportmulticourseactivity->url, 'method' => 'get'));
         echo html_writer::start_div();
 
-        echo html_writer::label(get_string('selectreporttype', 'report_teachersactivity'), 'menureader', false);
-        echo html_writer::select($reportteachersactivity->getAvailablereports(), 'reporttype',
-                $reportteachersactivity->reporttype, false);
+        echo html_writer::label(get_string('selectreporttype', 'report_multicourseactivity'), 'menureader', false);
+        echo html_writer::select($reportmulticourseactivity->getAvailablereports(), 'reporttype',
+                $reportmulticourseactivity->reporttype, false);
 
-        echo html_writer::label(get_string('selectcourse', 'report_teachersactivity'), 'menureader', false);
-        echo html_writer::select($coursesList, 'id', $reportteachersactivity->courseid, false);
+        echo html_writer::label(get_string('selectcourse', 'report_multicourseactivity'), 'menureader', false);
+        echo html_writer::select($coursesList, 'id', $reportmulticourseactivity->courseid, false);
         
         echo html_writer::empty_tag('input',
-                array('type' => 'submit', 'value' => get_string('showreport', 'report_teachersactivity')));
+                array('type' => 'submit', 'value' => get_string('showreport', 'report_multicourseactivity')));
 
         echo html_writer::end_div();
         echo html_writer::end_tag('form');
     }
 
-    public function report_selector_form_teacher_selector(report_teachersactivity $reportteachersactivity) {
+    public function report_selector_form_teacher_selector(report_multicourseactivity $reportmulticourseactivity) {
         global $DB;
         
-        $ccid = $DB->get_field('course', 'category', array('id' => $reportteachersactivity->courseid));
+        $ccid = $DB->get_field('course', 'category', array('id' => $reportmulticourseactivity->courseid));
         
         
         $users = $DB->get_records_sql('SELECT DISTINCT
@@ -107,28 +107,28 @@ class report_teachersactivity_renderer extends plugin_renderer_base {
                                             r.id = 3 AND c.category = :ccid', 
                 array('ccid' => $ccid));
         
-        $usersList[] = get_string('selectuser', 'report_teachersactivity');
+        $usersList[] = get_string('selectuser', 'report_multicourseactivity');
 
         foreach ($users as $value) {
             $usersList[$value->id] = "{$value->firstname} {$value->lastname}";
         }
         
         echo html_writer::start_tag('form',
-                array('class' => 'reportbadgesselecform', 'action' => $reportteachersactivity->url, 'method' => 'get'));
+                array('class' => 'reportbadgesselecform', 'action' => $reportmulticourseactivity->url, 'method' => 'get'));
         echo html_writer::start_div();
         
         echo html_writer::empty_tag('input',
-                array('type' => 'hidden', 'name' => 'id', 'value' => $reportteachersactivity->courseid));
+                array('type' => 'hidden', 'name' => 'id', 'value' => $reportmulticourseactivity->courseid));
 
-        echo html_writer::label(get_string('selectreporttype', 'report_teachersactivity'), 'menureader', false);
-        echo html_writer::select($reportteachersactivity->getAvailablereports(), 'reporttype',
-                $reportteachersactivity->reporttype, false);
+        echo html_writer::label(get_string('selectreporttype', 'report_multicourseactivity'), 'menureader', false);
+        echo html_writer::select($reportmulticourseactivity->getAvailablereports(), 'reporttype',
+                $reportmulticourseactivity->reporttype, false);
 
-        echo html_writer::label(get_string('selectuser', 'report_teachersactivity'), 'menureader', false);
-        echo html_writer::select($usersList, 'teacherid', $reportteachersactivity->teacherid, false);
+        echo html_writer::label(get_string('selectuser', 'report_multicourseactivity'), 'menureader', false);
+        echo html_writer::select($usersList, 'teacherid', $reportmulticourseactivity->teacherid, false);
         
         echo html_writer::empty_tag('input',
-                array('type' => 'submit', 'value' => get_string('showreport', 'report_teachersactivity')));
+                array('type' => 'submit', 'value' => get_string('showreport', 'report_multicourseactivity')));
 
         echo html_writer::end_div();
         echo html_writer::end_tag('form');

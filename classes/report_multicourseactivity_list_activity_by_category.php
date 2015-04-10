@@ -3,7 +3,7 @@
 /**
  * TeachersActivity table for displaying list of activities by category.
  *
- * @package    report_teachersactivity
+ * @package    report_multicourseactivity
  * @copyright  2015 Andraž Prinčič <atletek@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -20,12 +20,12 @@ class list_activity_by_category extends table_sql {
 
         $this->define_columns(array('ime_ucilnice', 'stevilo_nalog', 'stevilo_kvizov', 'stevilo_priponk', 'stevilo_www_strani', 'stevilo_udel'));
         $this->define_headers(array(
-            get_string('ime_ucilnice', 'report_teachersactivity'),
-            get_string('stevilo_nalog', 'report_teachersactivity'),
-            get_string('stevilo_kvizov', 'report_teachersactivity'),
-            get_string('stevilo_priponk', 'report_teachersactivity'),
-            get_string('stevilo_www_strani', 'report_teachersactivity'),
-            get_string('stevilo_udel', 'report_teachersactivity')
+            get_string('ime_ucilnice', 'report_multicourseactivity'),
+            get_string('stevilo_nalog', 'report_multicourseactivity'),
+            get_string('stevilo_kvizov', 'report_multicourseactivity'),
+            get_string('stevilo_priponk', 'report_multicourseactivity'),
+            get_string('stevilo_www_strani', 'report_multicourseactivity'),
+            get_string('stevilo_udel', 'report_multicourseactivity')
                 )
         );
         $this->collapsible(false);
