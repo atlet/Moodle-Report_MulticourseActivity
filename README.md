@@ -1,1 +1,1 @@
-# Moodle-Report_TeachersActivity
+# Moodle-Report_MulticourseActivity
