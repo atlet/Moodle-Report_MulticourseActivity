@@ -14,6 +14,26 @@ require_once($CFG->dirroot.'/report/multicourseactivity/renderable.php');
 $reporttype = optional_param('reporttype', '', PARAM_INT); // Which report list to display.
 $teacherid = optional_param('teacherid', '', PARAM_INT); // Which report list to display.
 
+$startday = optional_param('startday', 0, PARAM_INT);
+$startmonth = optional_param('startmonth', 0, PARAM_INT);
+$startyear = optional_param('startyear', 0, PARAM_INT);
+
+$endday = optional_param('endday', 0, PARAM_INT);
+$endmonth = optional_param('endmonth', 0, PARAM_INT);
+$endyear = optional_param('endyear', 0, PARAM_INT);
+
+if ($startday !== 0 && $startmonth !== 0 && $startyear !== 0) {
+    $currentstarttime = mktime(0, 0, 0, $startmonth, $startday, $startyear);
+} else {
+    $currentstarttime = mktime(0, 0, 0, 1, 1, date('Y'));
+}
+
+if ($endday !== 0 && $endmonth !== 0 && $endyear !== 0) {
+    $currentendtime = mktime(23, 59, 59, $endmonth, $endday, $endyear);
+} else {
+    $currentendtime = time();
+}
+
 $id = required_param('id', PARAM_INT);// Course ID.
 $params = array();
 if ($id !== 0) {
@@ -47,7 +67,7 @@ if ($id) {
 require_capability('report/multicourseactivity:view', $context);
 
 $output = $PAGE->get_renderer('report_multicourseactivity');
-$submissionwidget = new report_multicourseactivity($id, $url, $reporttype, $teacherid);
+$submissionwidget = new report_multicourseactivity($id, $url, $reporttype, $teacherid, $currentstarttime, $currentendtime);
 
 echo $output->header();
 echo $output->render($submissionwidget);
@@ -78,6 +98,10 @@ switch ($reporttype) {
         
     case 7:
         $submissionwidget->show_table_list_teachers_activity();
+        break;
+    
+    case 8:
+        $submissionwidget->show_table_list_logins();
         break;
     
     default:

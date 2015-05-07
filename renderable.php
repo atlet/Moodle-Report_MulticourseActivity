@@ -16,6 +16,7 @@ require_once($CFG->dirroot . '/report/multicourseactivity/classes/report_multico
 require_once($CFG->dirroot . '/report/multicourseactivity/classes/report_multicourseactivity_list_activity_by_category.php');
 require_once($CFG->dirroot . '/report/multicourseactivity/classes/report_multicourseactivity_list_activities_of_participants.php');
 require_once($CFG->dirroot . '/report/multicourseactivity/classes/report_multicourseactivity_list_teachers_activity.php');
+require_once($CFG->dirroot . '/report/multicourseactivity/classes/report_multicourseactivity_list_logins.php');
 
 class report_multicourseactivity implements renderable {
 
@@ -27,6 +28,8 @@ class report_multicourseactivity implements renderable {
     public $teacherid = NULL;
     public $courseid;
     public $table;
+    public $startdate;
+    public $enddate;
     private $whereOptions = array();
     private $whereParameters = array();
 
@@ -36,7 +39,7 @@ class report_multicourseactivity implements renderable {
      * @param moodle_url|string $url (optional) page url.
      * @param string $reporttype (optional) which report list to display.
      */
-    public function __construct($courseid = NULL, $url = "", $reporttype = "", $teacherid = "") {
+    public function __construct($courseid = NULL, $url = "", $reporttype = "", $teacherid = "", $startdate = "", $enddate = "") {
 
         global $PAGE;
 
@@ -62,6 +65,18 @@ class report_multicourseactivity implements renderable {
                 $reporttype = null;
             }
         }
+        
+        if (empty($startdate)) {
+            $this->startdate = mktime(0, 0, 0, 1, 1, date('Y'));
+        } else {
+            $this->startdate = $startdate;
+        }
+        
+        if (empty($enddate)) {
+            $this->enddate = time();
+        } else {
+            $this->enddate = $enddate;
+        }
 
         $this->reporttype = $reporttype;
     }
@@ -74,8 +89,32 @@ class report_multicourseactivity implements renderable {
             4 => get_string('listperformersactivity', 'report_multicourseactivity'),
             5 => get_string('listactivitybycategory', 'report_multicourseactivity'),
             6 => get_string('listactivitiesofparticipants', 'report_multicourseactivity'),
-            7 => get_string('listmulticourseactivity', 'report_multicourseactivity')
+            7 => get_string('listmulticourseactivity', 'report_multicourseactivity'),
+            8 => get_string('listlogins', 'report_multicourseactivity'),
         );
+    }
+    
+    // Vse prijave in unikatne prijave
+    public function show_table_list_logins() {
+        $fields = "CONCAT(MONTH(FROM_UNIXTIME(timecreated)) , DAY(FROM_UNIXTIME(timecreated)) , YEAR(FROM_UNIXTIME(timecreated))) AS id,
+            COUNT(userid) AS 'logins',
+                    COUNT(DISTINCT userid) AS 'uniqu_logins',
+                    timecreated";
+        
+        $this->table = new list_logins('report_log');
+        $this->table->set_sql($fields,
+                "{logstore_standard_log}",
+                "timecreated > :startdate
+                    AND timecreated <= :enddate
+                    AND action = 'loggedin'
+            GROUP BY MONTH(FROM_UNIXTIME(timecreated)) , DAY(FROM_UNIXTIME(timecreated)) , YEAR(FROM_UNIXTIME(timecreated))
+            ORDER BY MONTH(FROM_UNIXTIME(timecreated)) , DAY(FROM_UNIXTIME(timecreated)) , YEAR(FROM_UNIXTIME(timecreated))",
+                array('startdate' => $this->startdate, 'enddate' => $this->enddate));
+        
+        $this->table->define_baseurl($this->url);
+        $this->table->is_downloadable(true);
+        $this->table->show_download_buttons_at(array(TABLE_P_BOTTOM));
+        $this->table->out(25, true);
     }
     
     // Aktivnosti učitelja

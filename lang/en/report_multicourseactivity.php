@@ -6,7 +6,9 @@ $string['pluginname'] = 'Multicourse Activity';
 $string['selectreporttype'] = 'Report type';
 $string['showreport'] = 'Show report';
 $string['selectcourse'] = 'Select course';
-$string['selectuser'] = 'Selecr an user';
+$string['selectuser'] = 'Select an user';
+$string['fromdate'] = "From date";
+$string['todate'] = "To date";
 
 // renderable.php
 $string['listcourseactivity'] = 'Course activity';
@@ -16,6 +18,7 @@ $string['listperformersactivity'] = 'Performers activity';
 $string['listactivitybycategory'] = 'Activity by category';
 $string['listactivitiesofparticipants'] = 'Activities of participants';
 $string['listmulticourseactivity'] = 'Teachers activity';
+$string['listlogins'] = 'Logins';
 
 // report_multicourseactivity_list_course_activity.php
 $string['shortname'] = 'Short name';
@@ -57,3 +60,8 @@ $string['st_ogledov'] = 'N. of views';
 $string['ime'] = 'First name';
 $string['priimek'] = 'Last name';
 $string['nazadnje_urejanje'] = 'Last edit';
+
+// report_multicourseactivity_list_logins.php
+$string['logins'] = 'Logins';
+$string['uniqu_logins'] = 'Unique logins';
+$string['timecreated'] = 'Date';
