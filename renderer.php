@@ -18,20 +18,20 @@ class report_multicourseactivity_renderer extends plugin_renderer_base {
             case 3:
                 $this->report_selector_form_course_selector($reportmulticourseactivity);
                 break;
-            
-            case 2:
-                $this->report_selector_form_date_selector($reportmulticourseactivity);
-                break;
 
             case 6:
-                $this->report_selector_form_teacher_selector_date($reportmulticourseactivity);
-                break;
             case 7:
                 $this->report_selector_form_teacher_selector($reportmulticourseactivity);
                 break;
             
             case 8:
+            case 9:
+            case 11:
                 $this->report_selector_form_date_selector($reportmulticourseactivity);
+                break;
+            
+            case 10:
+                $this->report_selector_form_days_selector($reportmulticourseactivity);
                 break;
             
             default:
@@ -238,6 +238,42 @@ class report_multicourseactivity_renderer extends plugin_renderer_base {
         
         echo html_writer::label(get_string('todate', 'report_multicourseactivity'), 'menureader', false);
         echo $enddatetimeoutput;        
+        
+        echo html_writer::empty_tag('input',
+                array('type' => 'submit', 'value' => get_string('showreport', 'report_multicourseactivity')));
+
+        echo html_writer::end_div();
+        echo html_writer::end_tag('form');
+    }
+    
+    public function report_selector_form_days_selector(report_multicourseactivity $reportmulticourseactivity) {
+                
+        $days[] = array();
+        $days[1] = 1;
+        $days[2] = 2;
+        $days[3] = 3;
+        $days[4] = 4;
+        $days[5] = 5;
+        $days[6] = 6;
+        $days[7] = 7;
+        $days[14] = 14;
+        $days[30] = 30;
+        $days[60] = 60;
+        $days[90] = 90;
+        
+        echo html_writer::start_tag('form',
+                array('class' => 'reportbadgesselecform', 'action' => $reportmulticourseactivity->url, 'method' => 'get'));
+        echo html_writer::start_div();
+        
+        echo html_writer::empty_tag('input',
+                array('type' => 'hidden', 'name' => 'id', 'value' => $reportmulticourseactivity->courseid));
+
+        echo html_writer::label(get_string('selectreporttype', 'report_multicourseactivity'), 'menureader', false);
+        echo html_writer::select($reportmulticourseactivity->getAvailablereports(), 'reporttype',
+                $reportmulticourseactivity->reporttype, false);
+
+        echo html_writer::label(get_string('ndays', 'report_multicourseactivity'), 'menureader', false);
+        echo html_writer::select($days, 'ndays', $reportmulticourseactivity->ndays, false);
         
         echo html_writer::empty_tag('input',
                 array('type' => 'submit', 'value' => get_string('showreport', 'report_multicourseactivity')));

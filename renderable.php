@@ -17,6 +17,9 @@ require_once($CFG->dirroot . '/report/multicourseactivity/classes/report_multico
 require_once($CFG->dirroot . '/report/multicourseactivity/classes/report_multicourseactivity_list_activities_of_participants.php');
 require_once($CFG->dirroot . '/report/multicourseactivity/classes/report_multicourseactivity_list_teachers_activity.php');
 require_once($CFG->dirroot . '/report/multicourseactivity/classes/report_multicourseactivity_list_logins.php');
+require_once($CFG->dirroot . '/report/multicourseactivity/classes/report_multicourseactivity_list_learners_activity_by_date.php');
+require_once($CFG->dirroot . '/report/multicourseactivity/classes/report_multicourseactivity_list_learners_activity_n_days.php');
+require_once($CFG->dirroot . '/report/multicourseactivity/classes/report_multicourseactivity_list_activities_of_participants_by_date.php');
 
 class report_multicourseactivity implements renderable {
 
@@ -30,6 +33,7 @@ class report_multicourseactivity implements renderable {
     public $table;
     public $startdate;
     public $enddate;
+    public $ndays;
     private $whereOptions = array();
     private $whereParameters = array();
 
@@ -39,7 +43,7 @@ class report_multicourseactivity implements renderable {
      * @param moodle_url|string $url (optional) page url.
      * @param string $reporttype (optional) which report list to display.
      */
-    public function __construct($courseid = NULL, $url = "", $reporttype = "", $teacherid = "", $startdate = "", $enddate = "") {
+    public function __construct($courseid = NULL, $url = "", $reporttype = "", $teacherid = "", $startdate = "", $enddate = "", $ndays = 30) {
 
         global $PAGE;
 
@@ -79,6 +83,8 @@ class report_multicourseactivity implements renderable {
         }
 
         $this->reporttype = $reporttype;
+        
+        $this->ndays = $ndays;
     }
 
     public function getAvailablereports() {
@@ -91,6 +97,9 @@ class report_multicourseactivity implements renderable {
             6 => get_string('listactivitiesofparticipants', 'report_multicourseactivity'),
             7 => get_string('listmulticourseactivity', 'report_multicourseactivity'),
             8 => get_string('listlogins', 'report_multicourseactivity'),
+            9 => get_string('listlearnersactivitybydate', 'report_multicourseactivity'),
+            10 => get_string('listlearnersactivitylastndays', 'report_multicourseactivity'),
+            11 => get_string('listactivitiesofparticipantsbydate', 'report_multicourseactivity')
         );
     }
     
@@ -718,5 +727,115 @@ class report_multicourseactivity implements renderable {
         $this->table->show_download_buttons_at(array(TABLE_P_BOTTOM));
         $this->table->out(25, true);
     }
+    
+    // Aktivnosti učečih v učilnicah v določeni kategoriji
+    public function show_table_list_learners_activity_by_date() {
+        $fields = "COUNT(l.userid) AS stevilo_aktivnosti,
+                    COUNT(DISTINCT r.userid) AS st_aktivnih_uporabnikov,
+                    c.fullname AS ucilnica";
+        
+        $this->whereParameters['startdate'] = $this->startdate;
+        $this->whereParameters['enddate'] = $this->enddate;
+        
+        $this->table = new list_learners_activity_by_date('report_log');
+        $this->table->set_sql($fields,
+                "{logstore_standard_log} l,
+                    {user} u,
+                    {role_assignments} r,
+                    {course} c,
+                    {course_categories} AS cat", 
+                "c.id = l.courseid
+                    AND c.category = cat.id
+        AND (cat.path LIKE '%/68/%'
+        OR cat.path LIKE '%/68')
+        AND l.userid = u.id
+        AND (l.timecreated > :startdate
+        AND l.timecreated <= :enddate)
+        AND r.contextid = (SELECT 
+            id
+        FROM
+            {context}
+        WHERE
+            contextlevel = 50
+                AND instanceid = l.courseid)
+        AND r.roleid = 5",
+                $this->whereParameters);
+        
+        $this->table->define_baseurl($this->url);
+        $this->table->is_downloadable(true);
+        $this->table->show_download_buttons_at(array(TABLE_P_BOTTOM));
+        $this->table->out(25, true);
+    }
+    
+    // Aktivnosti udeležencev - zadnjih N dni
+    public function show_table_list_learners_activity_last_n_days() {
+        $fields = "u.id AS userid,
+                    u.username,
+                    FROM_UNIXTIME(l.timecreated) AS zadnji_dostop,
+                    c.id AS rcourseid,
+                    c.fullname AS nazadnje_dostopana,
+                    agg.days AS st_pregledovanih_dni,
+                    agg.numdates AS st_aktivnih_dni,
+                    agg.numcourses AS st_obiskanh_ucilnic,
+                    agg.numlogs AS st_vstopov_v_ucil";
+        
+        $this->table = new list_learners_activity_n_days('report_log');
+        $this->table->set_sql($fields,
+                "{logstore_standard_log} l
+                    INNER JOIN
+                {user} u ON l.userid = u.id
+                    INNER JOIN
+                {course} c ON l.courseid = c.id
+                    INNER JOIN
+                {role_assignments} r ON r.userid = l.userid
+                    INNER JOIN
+                (SELECT 
+                    days,
+                        userid,
+                        MAX(l.timecreated) AS maxtime,
+                        COUNT(DISTINCT DATE(FROM_UNIXTIME(l.timecreated))) AS 'numdates',
+                        COUNT(DISTINCT courseid) AS numcourses,
+                        COUNT(*) AS numlogs
+                FROM
+                    {logstore_standard_log} l
+                INNER JOIN {course} c ON l.courseid = c.id
+                INNER JOIN (SELECT :ndays AS days) var
+                WHERE
+                    l.timecreated > (UNIX_TIMESTAMP() - ((60 * 60 * 24) * days))
+                        AND c.format != 'site'
+                GROUP BY userid) agg ON l.userid = agg.userid", 
+                "l.timecreated = agg.maxtime
+                        AND c.format != 'site'
+                        AND r.roleid = 5
+                GROUP BY userid
+                ORDER BY l.timecreated DESC",
+                array('ndays' => $this->ndays));
+        
+        $this->table->define_baseurl($this->url);
+        $this->table->is_downloadable(true);
+        $this->table->show_download_buttons_at(array(TABLE_P_BOTTOM));
+        $this->table->out(25, true);
+    }
 
+    // Aktivnosti udeležencev v določenem obdobju
+    public function show_table_list_activities_of_participants_by_date() {
+        $fields = "COUNT(l.userid) AS skupna_aktivnost,
+                    l.timecreated AS dan_mesec_leto";
+        
+        $this->table = new list_activities_of_participants_by_date('report_log');
+        $this->table->set_sql($fields,
+                "{logstore_standard_log} l,
+                    {role_assignments} r", 
+                "r.userid = l.userid
+                    AND l.timecreated > :startdate
+                    AND l.timecreated <= :enddate
+                    AND r.roleid = 5",
+                array('startdate' => $this->startdate, 'enddate' => $this->enddate));
+        
+        $this->table->define_baseurl($this->url);
+        $this->table->is_downloadable(true);
+        $this->table->show_download_buttons_at(array(TABLE_P_BOTTOM));
+        $this->table->out(25, true);
+    }
+    
 }

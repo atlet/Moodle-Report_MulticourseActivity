@@ -9,6 +9,7 @@ $string['selectcourse'] = 'Select course';
 $string['selectuser'] = 'Select an user';
 $string['fromdate'] = "From date";
 $string['todate'] = "To date";
+$string['ndays'] = "N. days";
 
 // renderable.php
 $string['listcourseactivity'] = 'Course activity';
@@ -19,6 +20,9 @@ $string['listactivitybycategory'] = 'Activity by category';
 $string['listactivitiesofparticipants'] = 'Activities of participants';
 $string['listmulticourseactivity'] = 'Teachers activity';
 $string['listlogins'] = 'Logins';
+$string['listlearnersactivitybydate'] = 'Learners activity by date';
+$string['listlearnersactivitylastndays'] = 'Learners activity last N. days';
+$string['listactivitiesofparticipantsbydate'] = 'Activities of participants by date';
 
 // report_multicourseactivity_list_course_activity.php
 $string['shortname'] = 'Short name';
@@ -65,3 +69,22 @@ $string['nazadnje_urejanje'] = 'Last edit';
 $string['logins'] = 'Logins';
 $string['uniqu_logins'] = 'Unique logins';
 $string['timecreated'] = 'Date';
+
+// report_multicourseactivity_list_learners_activity_by_date.php
+$string['st_aktivnih_uporabnikov'] = "N. of active users";
+$string['stevilo_aktivnosti'] = "N. of activities";
+
+// report_multicourseactivity_list_learners_activity_n_days.php
+$string['userid'] = "User ID";
+$string['username'] = "User name";
+$string['zadnji_dostop'] = "Last entry";
+$string['rcourseid'] = "Course ID";
+$string['nazadnje_dostopana'] = "Last view";
+$string['st_pregledovanih_dni'] = "N. of view days";
+$string['st_aktivnih_dni'] = "N. of activity days";
+$string['st_obiskanh_ucilnic'] = "N. of visited courses";
+$string['st_vstopov_v_ucil'] = "N. of course entry";
+
+// report_multicourseactivity_list_activities_of_participants_by_date
+$string['skupna_aktivnost'] = "All activities";
+$string['dan_mesec_leto'] = "Date";

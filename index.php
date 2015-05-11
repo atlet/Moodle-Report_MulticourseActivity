@@ -22,6 +22,8 @@ $endday = optional_param('endday', 0, PARAM_INT);
 $endmonth = optional_param('endmonth', 0, PARAM_INT);
 $endyear = optional_param('endyear', 0, PARAM_INT);
 
+$ndays = optional_param('ndays', 30, PARAM_INT);
+
 if ($startday !== 0 && $startmonth !== 0 && $startyear !== 0) {
     $currentstarttime = mktime(0, 0, 0, $startmonth, $startday, $startyear);
 } else {
@@ -67,7 +69,7 @@ if ($id) {
 require_capability('report/multicourseactivity:view', $context);
 
 $output = $PAGE->get_renderer('report_multicourseactivity');
-$submissionwidget = new report_multicourseactivity($id, $url, $reporttype, $teacherid, $currentstarttime, $currentendtime);
+$submissionwidget = new report_multicourseactivity($id, $url, $reporttype, $teacherid, $currentstarttime, $currentendtime, $ndays);
 
 echo $output->header();
 echo $output->render($submissionwidget);
@@ -102,6 +104,18 @@ switch ($reporttype) {
     
     case 8:
         $submissionwidget->show_table_list_logins();
+        break;
+    
+    case 9:
+        $submissionwidget->show_table_list_learners_activity_by_date();
+        break;
+    
+    case 10:
+        $submissionwidget->show_table_list_learners_activity_last_n_days();
+        break;
+    
+    case 11:
+        $submissionwidget->show_table_list_activities_of_participants_by_date();
         break;
     
     default:
