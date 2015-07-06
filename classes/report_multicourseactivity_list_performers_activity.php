@@ -29,7 +29,7 @@ class list_performers_activity extends table_sql {
         $this->sortable(true);
         $this->pageable(true);
     }
-
+    
     function other_cols($colname, $value) {
         
     }

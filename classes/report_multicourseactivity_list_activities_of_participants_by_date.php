@@ -28,6 +28,10 @@ class list_activities_of_participants_by_date extends table_sql {
         $this->sortable(true);
         $this->pageable(true);
     }
+    
+    function col_dan_mesec_leto($attempt){
+        return userdate($attempt->dan_mesec_leto, get_string('strftimedate', 'langconfig'));
+    }
 
     function other_cols($colname, $value) {
         

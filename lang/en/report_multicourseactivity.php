@@ -20,7 +20,7 @@ $string['listactivitybycategory'] = 'Activity by category';
 $string['listactivitiesofparticipants'] = 'Activities of participants';
 $string['listmulticourseactivity'] = 'Teachers activity';
 $string['listlogins'] = 'Logins';
-$string['listlearnersactivitybydate'] = 'Learners activity by date';
+$string['listlearnersactivitybydate'] = 'Learners activity in course by category';
 $string['listlearnersactivitylastndays'] = 'Learners activity last N. days';
 $string['listactivitiesofparticipantsbydate'] = 'Activities of participants by date';
 
