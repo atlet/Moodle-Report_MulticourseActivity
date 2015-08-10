@@ -116,8 +116,7 @@ class report_multicourseactivity implements renderable {
                 "timecreated > :startdate
                     AND timecreated <= :enddate
                     AND action = 'loggedin'
-            GROUP BY MONTH(FROM_UNIXTIME(timecreated)) , DAY(FROM_UNIXTIME(timecreated)) , YEAR(FROM_UNIXTIME(timecreated))
-            ORDER BY MONTH(FROM_UNIXTIME(timecreated)) , DAY(FROM_UNIXTIME(timecreated)) , YEAR(FROM_UNIXTIME(timecreated))",
+            GROUP BY MONTH(FROM_UNIXTIME(timecreated)) , DAY(FROM_UNIXTIME(timecreated)) , YEAR(FROM_UNIXTIME(timecreated))",
                 array('startdate' => $this->startdate, 'enddate' => $this->enddate));
         
         $this->table->define_baseurl($this->url);
@@ -165,13 +164,7 @@ class report_multicourseactivity implements renderable {
                 GROUP BY courseid) AS urejanje ON c.id = urejanje.courseid",
                 "ra.roleid IN (3)
                         AND cx.contextlevel = 50
-                        AND u.id = :uid
-                ORDER BY (SELECT 
-                        MAX(la.timeaccess)
-                    FROM
-                        {user_lastaccess} la
-                    WHERE
-                        c.id = la.courseid AND la.userid = u.id) DESC",
+                        AND u.id = :uid",
                 array('uid' => $this->teacherid));
         
         $this->table->define_baseurl($this->url);
@@ -431,7 +424,7 @@ class report_multicourseactivity implements renderable {
                             r.id = 3 AND u.id = :uid6)
                         AND action = 'viewed'
                 GROUP BY log.courseid) AS ogledi ON ogledi.id_ucilnice = c.id", 
-                "r.id = 3 AND u.id = :uid7 ORDER BY c.id",
+                "r.id = 3 AND u.id = :uid7",
                 array('uid1' => $this->teacherid, 'uid2' => $this->teacherid, 'uid3' => $this->teacherid, 'uid4' => $this->teacherid, 'uid5' => $this->teacherid, 'uid6' => $this->teacherid, 'uid7' => $this->teacherid));
         
         $this->table->define_baseurl($this->url);
@@ -807,8 +800,7 @@ class report_multicourseactivity implements renderable {
                 "l.timecreated = agg.maxtime
                         AND c.format != 'site'
                         AND r.roleid = 5
-                GROUP BY userid
-                ORDER BY l.timecreated DESC",
+                GROUP BY userid",
                 array('ndays' => $this->ndays));
         
         $this->table->define_baseurl($this->url);
