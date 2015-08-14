@@ -18,11 +18,8 @@ class list_teachers_activity extends table_sql {
 
         $this->set_attribute('class', 'reportlog generaltable generalbox');
 
-        $this->define_columns(array('ime', 'priimek', 'shortname', 'nazadnje_urejanje', 'zadnji_dostop'));
+        $this->define_columns(array('nazadnje_urejanje', 'zadnji_dostop'));
         $this->define_headers(array(
-            get_string('ime', 'report_multicourseactivity'),
-            get_string('priimek', 'report_multicourseactivity'),
-            get_string('shortname', 'report_multicourseactivity'),
             get_string('nazadnje_urejanje', 'report_multicourseactivity'),
             get_string('zadnji_dostop', 'report_multicourseactivity')
                 )
