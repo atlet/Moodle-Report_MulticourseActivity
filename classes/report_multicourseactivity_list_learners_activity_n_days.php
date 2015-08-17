@@ -37,9 +37,15 @@ class list_learners_activity_n_days extends table_sql {
     }
 
     function other_cols($colname, $value) {
-        
-    }
+        if ($colname == 'nazadnje_dostopana') {            
+            $caurl = new moodle_url('/course/view.php', array('id' => $value->rcourseid));            
 
+            $ret = '<a href="' . $caurl . '">' . $value->nazadnje_dostopana . '</a>';
+
+            return $ret;
+        }
+    }
+        
     function query_db($pagesize, $useinitialsbar = true) {
         global $DB;
         if (!$this->is_downloading()) {

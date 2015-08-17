@@ -7,7 +7,7 @@
  * @copyright  2015 Andraž Prinčič <atletek@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+ini_set('max_execution_time', 300);
 require('../../config.php');
 require_once($CFG->dirroot.'/report/multicourseactivity/lib.php');
 require_once($CFG->dirroot.'/report/multicourseactivity/renderable.php');

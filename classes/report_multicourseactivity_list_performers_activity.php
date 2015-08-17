@@ -30,8 +30,14 @@ class list_performers_activity extends table_sql {
         $this->pageable(true);
     }
     
-    function other_cols($colname, $value) {
-        
+    function other_cols($colname, $value) {        
+        if ($colname == 'ime') {            
+            $caurl = new moodle_url('/course/view.php', array('id' => $value->id));            
+
+            $ret = '<a href="' . $caurl . '">' . $value->ime . '</a>';
+
+            return $ret;
+        }
     }
 
     function query_db($pagesize, $useinitialsbar = true) {

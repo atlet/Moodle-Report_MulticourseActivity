@@ -181,6 +181,7 @@ class report_multicourseactivity implements renderable {
         
         $fields = "stevilo_nalog.id_nal,
                     stevilo_nalog.ime AS ime_ucilnice,
+                    c.id AS id_ucilnice,
                     IF(stevilo_nalog.stevilo IS NULL,
                         0,
                         stevilo_nalog.stevilo) AS stevilo_nalog,
@@ -439,7 +440,7 @@ class report_multicourseactivity implements renderable {
         
         $ccid = $DB->get_field('course', 'category', array('id' => $this->courseid));
         
-        $fields = "ime_ucilnice.ime,
+        $fields = "c.id, ime_ucilnice.ime,
                     IF(urejanje.nazadnje_urejanje IS NULL,
                         'nikoli ni urejal/a',
                         urejanje.nazadnje_urejanje) AS zadnje_urejanje,

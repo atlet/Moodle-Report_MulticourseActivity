@@ -35,8 +35,14 @@ class list_course_activity extends table_sql {
         $this->pageable(true);
     }
 
-    function other_cols($colname, $value) {
-        
+    function other_cols($colname, $value) {        
+        if ($colname == 'shortname') {            
+            $caurl = new moodle_url('/course/view.php', array('id' => $value->id));            
+
+            $ret = '<a href="' . $caurl . '">' . $value->shortname . '</a>';
+
+            return $ret;
+        }
     }
 
     function query_db($pagesize, $useinitialsbar = true) {

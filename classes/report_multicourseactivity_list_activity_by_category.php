@@ -18,24 +18,40 @@ class list_activity_by_category extends table_sql {
 
         $this->set_attribute('class', 'reportlog generaltable generalbox');
 
-        $this->define_columns(array('ime_ucilnice', 'stevilo_nalog', 'stevilo_kvizov', 'stevilo_priponk', 'stevilo_www_strani', 'stevilo_udel'));
+        $this->define_columns(array('ime_ucilnice', 'stevilo_nalog', 'stevilo_kvizov', 'stevilo_priponk', 'stevilo_www_strani', 'stevilo_udel', 'id_ucilnice'));
         $this->define_headers(array(
             get_string('ime_ucilnice', 'report_multicourseactivity'),
             get_string('stevilo_nalog', 'report_multicourseactivity'),
             get_string('stevilo_kvizov', 'report_multicourseactivity'),
             get_string('stevilo_priponk', 'report_multicourseactivity'),
             get_string('stevilo_www_strani', 'report_multicourseactivity'),
-            get_string('stevilo_udel', 'report_multicourseactivity')
+            get_string('stevilo_udel', 'report_multicourseactivity'),
+            ''
                 )
         );
         $this->collapsible(false);
         $this->sortable(true);
         $this->pageable(true);
     }
-
+    
     function other_cols($colname, $value) {
+        if ($colname == 'id_ucilnice') {            
+            $caurl = new moodle_url('/report/multicourseactivity/index.php', array('id' => $value->id_ucilnice, 'reporttype' => 1));
+
+            $ret = '<a href="' . $caurl . '">' . get_string('listcourseactivity', 'report_multicourseactivity') . '</a>';
+
+            return $ret;
+        }
         
+        if ($colname == 'ime_ucilnice') {            
+            $caurl = new moodle_url('/course/view.php', array('id' => $value->id_ucilnice));            
+
+            $ret = '<a href="' . $caurl . '">' . $value->ime_ucilnice . '</a>';
+
+            return $ret;
+        }
     }
+    
 
     function query_db($pagesize, $useinitialsbar = true) {
         global $DB;

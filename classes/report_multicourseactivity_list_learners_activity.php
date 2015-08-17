@@ -28,7 +28,7 @@ class list_learners_activity extends table_sql {
             get_string('stevilo_kvizov', 'report_multicourseactivity'),
             get_string('stevilo_resevanj_kvizov', 'report_multicourseactivity'),
             get_string('diskusije_in_komentarji', 'report_multicourseactivity'),
-            'a'
+            ''
                 )
         );
         $this->collapsible(false);
@@ -47,7 +47,15 @@ class list_learners_activity extends table_sql {
 
             return $ret;
         }
-    }
+        
+        if ($colname == 'ime_ucilnice') {            
+            $caurl = new moodle_url('/course/view.php', array('id' => $value->id_ucilnice));            
+
+            $ret = '<a href="' . $caurl . '">' . $value->ime_ucilnice . '</a>';
+
+            return $ret;
+        }
+    }    
 
     function query_db($pagesize, $useinitialsbar = true) {
         global $DB;

@@ -33,9 +33,15 @@ class list_activities_of_participants extends table_sql {
         $this->sortable(true);
         $this->pageable(true);
     }
+    
+    function other_cols($colname, $value) {        
+        if ($colname == 'shortname') {            
+            $caurl = new moodle_url('/course/view.php', array('id' => $value->id_ucilnice));            
 
-    function other_cols($colname, $value) {
-        
+            $ret = '<a href="' . $caurl . '">' . $value->shortname . '</a>';
+
+            return $ret;
+        }
     }
 
     function query_db($pagesize, $useinitialsbar = true) {

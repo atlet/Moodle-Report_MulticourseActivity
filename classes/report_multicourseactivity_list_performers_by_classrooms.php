@@ -42,6 +42,14 @@ class list_performers_by_classrooms extends table_sql {
 
             return $ret;
         }
+        
+        if ($colname == 'shortname') {            
+            $caurl = new moodle_url('/course/view.php', array('id' => $value->cid));            
+
+            $ret = '<a href="' . $caurl . '">' . $value->shortname . '</a>';
+
+            return $ret;
+        }
     }
 
     function query_db($pagesize, $useinitialsbar = true) {
